@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, firstValueFrom } from 'rxjs';
+import { CurrencyIso } from '../constants/currencies';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import { Observable, firstValueFrom } from 'rxjs';
 export class RatesService {
   constructor(private http: HttpClient) { }
 
-  getExchangeRates(): Promise<any> {
-    return firstValueFrom(this.http.get('http://api.nbp.pl/api/exchangerates/rates/A/USD'));
+  getExchangeRates(currency = CurrencyIso.usd): Promise<any> {
+    return firstValueFrom(this.http.get(`http://api.nbp.pl/api/exchangerates/rates/A/${currency}`));
   }
 }

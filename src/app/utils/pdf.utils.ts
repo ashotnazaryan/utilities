@@ -25,7 +25,7 @@ export const generatePDF = async (details: ReportDetails & { amount: string }) =
   const pages = pdfDoc.getPages();
   const firstPage = pages[0];
 
-  page.drawText(`Invoice for ${details.firstName} ${details.lastName}`, { x: PAGE_INDENT, y: height - 50, font: timesRomanFont, size: 40 });
+  page.drawText(`Invoice for ${details.fullName}`, { x: PAGE_INDENT, y: height - 50, font: timesRomanFont, size: 40 });
 
   firstPage.drawText(`Total: ${details.amount}`, {
     x: PAGE_INDENT,

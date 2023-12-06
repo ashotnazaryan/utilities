@@ -5,27 +5,34 @@ import { distinctUntilChanged } from 'rxjs/operators';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
 import { RateStore } from '../../store/report.store';
 import { generatePDF } from '../../utils/pdf.utils';
 import { ReportDetails } from '../../models/report';
+import { Currency } from '../../models/currency';
+import { CURRENCIES, CurrencyIso } from '../../constants/currencies';
+import { ReportFormField } from '../../constants/form-fields';
 
 @Component({
   selector: 'app-report',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatButtonModule],
+  imports: [CommonModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatSelectModule],
   providers: [RateStore],
   templateUrl: './report.component.html',
   styleUrl: './report.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReportComponent implements OnInit {
-  protected reportForm: FormGroup = new FormGroup({
-    salary: new FormControl('', [Validators.required]),
-    firstName: new FormControl('', [Validators.required]),
-    lastName: new FormControl('', [Validators.required]),
-  });
   readonly store = inject(RateStore);
-  protected rate = this.store.rate;
+  readonly currencies: Currency[] = CURRENCIES;
+  readonly reportFormField = ReportFormField;
+
+  reportForm: FormGroup = new FormGroup({
+    [ReportFormField.salary]: new FormControl('', [Validators.required]),
+    [ReportFormField.fullName]: new FormControl('', [Validators.required]),
+    [ReportFormField.currency]: new FormControl(CURRENCIES[0].iso, [Validators.required])
+  });
+  rate = this.store.rate;
 
   constructor() { }
 
@@ -37,16 +44,20 @@ export class ReportComponent implements OnInit {
   async generate(): Promise<void> {
     const { amount, details } = this.store;
 
-    await generatePDF({ amount: `${amount()} PLN`, ...details() });
+    await generatePDF({ amount: `${amount()} ${CurrencyIso.pln}`, ...details() });
   }
 
   private handleFormChanges(): void {
     this.reportForm.valueChanges
-      .pipe(
-        distinctUntilChanged()
-      )
-      .subscribe((value: ReportDetails) => {
-        this.store.setDetails(value);
+      .pipe(distinctUntilChanged())
+      .subscribe((formValue: ReportDetails) => {
+        this.store.setDetails(formValue);
+      });
+
+    this.reportForm.get(ReportFormField.currency)?.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe((currency: CurrencyIso) => {
+        this.store.getExchangeRates(currency);
       });
   }
 }
