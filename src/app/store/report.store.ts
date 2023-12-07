@@ -1,9 +1,9 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, patchState, withComputed, withMethods, withState } from '@ngrx/signals';
-import { calculateSalary } from '../utils/report.utils';
-import { RatesService } from '../services/rates.service';
-import { ReportDetails, ReportState } from '../models/report';
-import { CURRENCIES, CurrencyIso } from '../constants/currencies';
+import { calculateSalary } from '@utils';
+import { RatesService } from '@services';
+import { ReportDetails, ReportState } from '@models';
+import { CURRENCIES, CurrencyIso } from '@constants';
 
 const initialState: ReportState = {
   rate: 0,

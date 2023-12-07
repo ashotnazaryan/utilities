@@ -1,5 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import { ReportDetails } from '../models/report';
+import { ReportDetails } from '@models';
 
 const PAGE_INDENT = 50;
 

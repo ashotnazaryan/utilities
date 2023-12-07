@@ -1,22 +1,15 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { distinctUntilChanged } from 'rxjs/operators';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { RateStore } from '../../store/report.store';
-import { generatePDF } from '../../utils/pdf.utils';
-import { ReportDetails } from '../../models/report';
-import { Currency } from '../../models/currency';
-import { CURRENCIES, CurrencyIso } from '../../constants/currencies';
-import { ReportFormField } from '../../constants/form-fields';
+import { RateStore } from '@store';
+import { generatePDF } from '@utils';
+import { ReportDetails } from '@models';
+import { CurrencyIso } from '@constants';
+import { ReportFormComponent } from '@components';
 
 @Component({
   selector: 'app-report',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatSelectModule],
+  imports: [CommonModule, ReportFormComponent],
   providers: [RateStore],
   templateUrl: './report.component.html',
   styleUrl: './report.component.scss',
@@ -24,40 +17,27 @@ import { ReportFormField } from '../../constants/form-fields';
 })
 export class ReportComponent implements OnInit {
   readonly store = inject(RateStore);
-  readonly currencies: Currency[] = CURRENCIES;
-  readonly reportFormField = ReportFormField;
-
-  reportForm: FormGroup = new FormGroup({
-    [ReportFormField.salary]: new FormControl('', [Validators.required]),
-    [ReportFormField.fullName]: new FormControl('', [Validators.required]),
-    [ReportFormField.currency]: new FormControl(CURRENCIES[0].iso, [Validators.required])
-  });
   rate = this.store.rate;
 
   constructor() { }
 
   ngOnInit(): void {
     this.store.getExchangeRates();
-    this.handleFormChanges();
   }
 
-  async generate(): Promise<void> {
+  async handleFormSubmit(): Promise<void> {
     const { amount, details } = this.store;
 
     await generatePDF({ amount: `${amount()} ${CurrencyIso.pln}`, ...details() });
   }
 
-  private handleFormChanges(): void {
-    this.reportForm.valueChanges
-      .pipe(distinctUntilChanged())
-      .subscribe((formValue: ReportDetails) => {
-        this.store.setDetails(formValue);
-      });
+  handleFormChanges(formValue: ReportDetails): void {
+    const { details: { currency } } = this.store;
 
-    this.reportForm.get(ReportFormField.currency)?.valueChanges
-      .pipe(distinctUntilChanged())
-      .subscribe((currency: CurrencyIso) => {
-        this.store.getExchangeRates(currency);
-      });
+    if (currency() !== formValue.currency) {
+      this.store.getExchangeRates(formValue.currency);
+    }
+
+    this.store.setDetails(formValue);
   }
 }
