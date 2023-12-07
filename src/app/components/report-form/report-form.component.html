@@ -1,0 +1,29 @@
+<form [formGroup]="reportForm" (ngSubmit)="submit()">
+  <div class="flex flex-col gap-2">
+    <div class="grid gap-2 grid-cols-2">
+      <mat-form-field>
+        <mat-label>Full name</mat-label>
+        <input matInput [formControlName]="reportFormField.fullName" placeholder="Your full name">
+        <mat-error *ngIf="reportForm.get(reportFormField.fullName)?.hasError('required')">Full name is required</mat-error>
+      </mat-form-field>
+      <div class="grid gap-2 grid-cols-2">
+        <mat-form-field>
+          <mat-label>Salary</mat-label>
+          <input type="number" matInput [formControlName]="reportFormField.salary" placeholder="Your salary">
+          <mat-error *ngIf="reportForm.get(reportFormField.salary)?.hasError('required')">Salary is required</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Currency</mat-label>
+          <mat-select [formControlName]="reportFormField.currency">
+            <mat-option *ngFor="let currency of currencies" [value]="currency.iso">
+              {{currency.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <button mat-raised-button color="primary" type="submit" class="self-end" [disabled]="reportForm.invalid">
+      Generate report
+    </button>
+  </div>
+</form>

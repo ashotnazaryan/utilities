@@ -1,4 +1,4 @@
-import { Currency } from '../models/currency';
+import { Currency } from '@models';
 
 export enum CurrencyIso {
   usd = 'USD',

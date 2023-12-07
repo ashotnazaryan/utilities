@@ -1,33 +1,5 @@
 <div class="flex flex-col gap-2">
   <h3 class="text-lg text-center mb-2">Report</h3>
-  <form [formGroup]="reportForm" (ngSubmit)="generate()">
-    <div class="flex flex-col gap-2">
-      <div class="grid gap-2 grid-cols-2">
-        <mat-form-field>
-          <mat-label>Full name</mat-label>
-          <input matInput [formControlName]="reportFormField.fullName" placeholder="Your full name">
-          <mat-error *ngIf="reportForm.get('fullName')?.hasError('required')">Full name is required</mat-error>
-        </mat-form-field>
-        <div class="grid gap-2 grid-cols-2">
-          <mat-form-field>
-            <mat-label>Salary</mat-label>
-            <input type="number" matInput [formControlName]="reportFormField.salary" placeholder="Your salary">
-            <mat-error *ngIf="reportForm.get('salary')?.hasError('required')">Salary is required</mat-error>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>Currency</mat-label>
-            <mat-select [formControlName]="reportFormField.currency">
-              <mat-option *ngFor="let currency of currencies" [value]="currency.iso">
-                {{currency.name}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      </div>
-      <button mat-raised-button color="primary" type="submit" class="self-end" [disabled]="reportForm.invalid">
-        Generate report
-      </button>
-      <strong>{{store.amount()}}</strong>
-    </div>
-  </form>
+  <app-report-form (onFormChanges)="handleFormChanges($event)" (onFormSubmit)="handleFormSubmit()"></app-report-form>
+  <strong>{{store.amount()}}</strong>
 </div>

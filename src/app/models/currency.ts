@@ -1,4 +1,4 @@
-import { CurrencyIso } from "../constants/currencies";
+import { CurrencyIso } from "@constants";
 
 export type CurrencySymbol = '$' | '€' | 'zł';
 
