@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -15,11 +15,11 @@ import { ReportDetails, Currency } from '@models';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatSelectModule, MatCardModule],
   templateUrl: './report-form.component.html',
-  styleUrl: './report-form.component.scss'
+  styleUrl: './report-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReportFormComponent implements OnInit {
   @Output() formChanged = new EventEmitter<ReportDetails>();
-  @Output() formPreviewed = new EventEmitter<void>();
   @Output() formSubmitted = new EventEmitter<void>();
 
   readonly currencies: Currency[] = CURRENCIES;
@@ -42,10 +42,6 @@ export class ReportFormComponent implements OnInit {
     this.handleFormChanges();
     // TODO: remove
     this.reportForm.patchValue(REPORT_MOCK, { emitEvent: true });
-  }
-
-  preview(): void {
-    this.formPreviewed.emit();
   }
 
   submit(): void {

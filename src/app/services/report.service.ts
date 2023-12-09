@@ -1,31 +1,37 @@
-import { Injectable } from '@angular/core';
-import { PDFDocument, StandardFonts } from 'pdf-lib';
+import { Injectable, inject } from '@angular/core';
+import { PDFDocument } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
 import { ReportDetails } from '@models';
 import {
   getCurrentDate,
   getLastDateOfPreviousMonth,
   getFirstDateOfPreviousMonth,
-  get14thDateOfCurrentMonth
+  getDayOfCurrentMonth,
+  getPreviousMonthName
 } from '@utils';
+import { FontService } from '@services';
 
 const MARGIN = 36;
 const FONT_SIZE_MEDIUM = 14;
-const FONT_SIZE_LARGE = 18;
+const FONT_SIZE_LARGE = 16;
 
 @Injectable({
   providedIn: 'root'
 })
-export class PdfService {
+export class ReportService {
   private pdfDoc?: PDFDocument;
+  private fontService = inject(FontService);
 
   async generateReport(details: ReportDetails & { amount: string }): Promise<void> {
     const pdfDoc = await PDFDocument.create();
+    pdfDoc.registerFontkit(fontkit);
     const page = pdfDoc.addPage();
     const { width, height } = page.getSize();
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontBytes = await this.fontService.loadUbuntuFont();
+    const boldFontBytes = await this.fontService.loadUbuntuFont('bold');
+    const font = await pdfDoc.embedFont(fontBytes);
+    const boldFont = await pdfDoc.embedFont(boldFontBytes);
     const { amount, sellerName, sellerAddress, sellerLocation, sellerVatID, sellerAccount, buyerName, buyerAddress, buyerLocation, buyerVatID } = details;
-
     this.pdfDoc = pdfDoc;
 
     page.drawText('Invoice No.', { x: MARGIN, y: height - MARGIN, font: boldFont, size: FONT_SIZE_MEDIUM });
@@ -38,7 +44,7 @@ export class PdfService {
     page.drawText(getLastDateOfPreviousMonth(), { x: MARGIN + 130, y: height - MARGIN - 40, font: font, size: FONT_SIZE_MEDIUM });
 
     page.drawText('Due date:', { x: MARGIN, y: height - MARGIN - 60, font: boldFont, size: FONT_SIZE_MEDIUM });
-    page.drawText(get14thDateOfCurrentMonth(), { x: MARGIN + 130, y: height - MARGIN - 60, font: font, size: FONT_SIZE_MEDIUM });
+    page.drawText(getDayOfCurrentMonth(14), { x: MARGIN + 130, y: height - MARGIN - 60, font: font, size: FONT_SIZE_MEDIUM });
 
     page.drawText('Payment type:', { x: MARGIN, y: height - MARGIN - 80, font: boldFont, size: FONT_SIZE_MEDIUM });
     page.drawText('Transfer', { x: MARGIN + 130, y: height - MARGIN - 80, font: font, size: FONT_SIZE_MEDIUM });
@@ -62,7 +68,7 @@ export class PdfService {
 
     const totalText = `Total: ${amount}`;
     const totalTextWidth = font.widthOfTextAtSize(totalText, FONT_SIZE_LARGE);
-    page.drawText(totalText, { x: width - totalTextWidth - 2 * MARGIN, y: MARGIN, font: boldFont });
+    page.drawText(totalText, { x: (width - totalTextWidth) / 2 - MARGIN, y: MARGIN, font: boldFont });
   }
 
   async getReportUrl(): Promise<string> {
@@ -80,7 +86,7 @@ export class PdfService {
     const link = document.createElement('a');
 
     link.href = blobUrl;
-    link.download = 'invoice.pdf';
+    link.download = `Invoice_${getPreviousMonthName()}.pdf`;
     document.body.appendChild(link);
     link.click();
     URL.revokeObjectURL(blobUrl);
