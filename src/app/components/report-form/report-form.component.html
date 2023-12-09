@@ -1,29 +1,105 @@
 <form [formGroup]="reportForm" (ngSubmit)="submit()">
-  <div class="flex flex-col gap-2">
-    <div class="grid gap-2 grid-cols-2">
-      <mat-form-field>
-        <mat-label>Full name</mat-label>
-        <input matInput [formControlName]="reportFormField.fullName" placeholder="Your full name">
-        <mat-error *ngIf="reportForm.get(reportFormField.fullName)?.hasError('required')">Full name is required</mat-error>
-      </mat-form-field>
-      <div class="grid gap-2 grid-cols-2">
-        <mat-form-field>
-          <mat-label>Salary</mat-label>
-          <input type="number" matInput [formControlName]="reportFormField.salary" placeholder="Your salary">
-          <mat-error *ngIf="reportForm.get(reportFormField.salary)?.hasError('required')">Salary is required</mat-error>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Currency</mat-label>
-          <mat-select [formControlName]="reportFormField.currency">
-            <mat-option *ngFor="let currency of currencies" [value]="currency.iso">
-              {{currency.name}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+  <div class="flex flex-col gap-4">
+    <div class="grid grid-cols-2 gap-4">
+      <div class="col-span-1">
+        <mat-card>
+          <mat-card-header class="mb-2">
+            <mat-card-title>Seller</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="grid grid-cols-1 grid-rows-3 gap-4">
+              <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input matInput [formControlName]="reportFormField.sellerName" placeholder="Seller name">
+                <mat-error *ngIf="reportForm.get(reportFormField.sellerName)?.hasError('required')">Seller name is
+                  required</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Address</mat-label>
+                <input matInput [formControlName]="reportFormField.sellerAddress" placeholder="Seller address">
+                <mat-error *ngIf="reportForm.get(reportFormField.sellerAddress)?.hasError('required')">Seller address is
+                  required</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Location</mat-label>
+                <input matInput [formControlName]="reportFormField.sellerLocation" placeholder="Seller location">
+                <mat-error *ngIf="reportForm.get(reportFormField.sellerLocation)?.hasError('required')">Seller location
+                  is required</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>VAT ID</mat-label>
+                <input matInput [formControlName]="reportFormField.sellerVatID" placeholder="Seller VAT ID">
+                <mat-error *ngIf="reportForm.get(reportFormField.sellerVatID)?.hasError('required')">Seller VAT ID is
+                  required</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Account</mat-label>
+                <input matInput [formControlName]="reportFormField.sellerAccount" placeholder="Seller account">
+                <mat-error *ngIf="reportForm.get(reportFormField.sellerAccount)?.hasError('required')">Seller account is
+                  required</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Salary</mat-label>
+                <input type="number" matInput [formControlName]="reportFormField.salary" placeholder="Seller salary">
+                <mat-error *ngIf="reportForm.get(reportFormField.salary)?.hasError('required')">Seller salary is
+                  required</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Currency</mat-label>
+                <mat-select [formControlName]="reportFormField.currency">
+                  <mat-option *ngFor="let currency of currencies" [value]="currency.iso">
+                    {{currency.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="col-span-1">
+        <mat-card>
+          <mat-card-header class="mb-2">
+            <mat-card-title>Buyer</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="grid grid-cols-1 grid-rows-3 gap-4">
+              <mat-form-field>
+                <mat-label>Name</mat-label>
+                <input matInput [formControlName]="reportFormField.buyerName" placeholder="Buyer name">
+                <mat-error *ngIf="reportForm.get(reportFormField.buyerName)?.hasError('required')">Buyer name is
+                  required</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Address</mat-label>
+                <input matInput [formControlName]="reportFormField.buyerAddress" placeholder="Buyer address">
+                <mat-error *ngIf="reportForm.get(reportFormField.buyerAddress)?.hasError('required')">Buyer address is
+                  required</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Location</mat-label>
+                <input matInput [formControlName]="reportFormField.buyerLocation" placeholder="Buyer location">
+                <mat-error *ngIf="reportForm.get(reportFormField.buyerLocation)?.hasError('required')">Buyer location is
+                  required</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>VAT ID</mat-label>
+                <input matInput [formControlName]="reportFormField.buyerVatID" placeholder="Buyer VAT ID">
+                <mat-error *ngIf="reportForm.get(reportFormField.buyerVatID)?.hasError('required')">Buyer VAT ID is
+                  required</mat-error>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
       </div>
     </div>
-    <button mat-raised-button color="primary" type="submit" class="self-end" [disabled]="reportForm.invalid">
-      Generate report
-    </button>
+    <!-- TODO: move actions to parent -->
+    <div class="flex justify-end gap-4">
+      <button mat-raised-button color="primary" type="button" (click)="preview()">
+        Preview report
+      </button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="reportForm.invalid">
+        Download report
+      </button>
+    </div>
   </div>
 </form>

@@ -1,5 +1,13 @@
 export enum ReportFormField {
   salary = 'salary',
-  fullName = 'fullName',
+  sellerName = 'sellerName',
+  sellerAddress = 'sellerAddress',
+  sellerLocation = 'sellerLocation',
+  sellerVatID = 'sellerVatID',
+  sellerAccount = 'sellerAccount',
+  buyerName = 'buyerName',
+  buyerAddress = 'buyerAddress',
+  buyerLocation = 'buyerLocation',
+  buyerVatID = 'buyerVatID',
   currency = 'currency'
 }
