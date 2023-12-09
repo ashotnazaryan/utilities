@@ -19,9 +19,14 @@ export const getFirstDateOfPreviousMonth = (): string => {
   return date.format(DATE_FORMAT_ISO);
 };
 
-export const get14thDateOfCurrentMonth = (): string => {
+export const getDayOfCurrentMonth = (day: number): string => {
   const currentDate = moment();
-  const date = currentDate.date(14);
-  
+  const date = currentDate.date(day);
+
   return date.format(DATE_FORMAT_ISO);
+};
+
+export const getPreviousMonthName = (): string => {
+  const currentDate = moment();
+  return currentDate.subtract(1, 'months').format('MMMM');
 };
