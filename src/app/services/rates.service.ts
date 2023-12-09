@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { CurrencyIso } from '@constants';
+import { NBPResponse } from '@models';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { CurrencyIso } from '@constants';
 export class RatesService {
   constructor(private http: HttpClient) { }
 
-  getExchangeRates(currency = CurrencyIso.usd): Promise<any> {
-    return firstValueFrom(this.http.get(`http://api.nbp.pl/api/exchangerates/rates/A/${currency}`));
+  getExchangeRates(date: string, currency = CurrencyIso.usd): Promise<NBPResponse> {
+    return firstValueFrom(this.http.get<NBPResponse>(`http://api.nbp.pl/api/exchangerates/rates/A/${currency}/${date}`));
   }
 }

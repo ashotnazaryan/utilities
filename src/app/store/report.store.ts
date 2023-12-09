@@ -7,7 +7,19 @@ import { CURRENCIES, CurrencyIso } from '@constants';
 
 const initialState: ReportState = {
   rate: 0,
-  details: { salary: 0, fullName: 'Anonymus', currency: CURRENCIES[0].iso }
+  details: {
+    salary: 0,
+    currency: CURRENCIES[0].iso,
+    sellerName: '',
+    sellerAddress: '',
+    sellerLocation: '',
+    sellerVatID: '',
+    sellerAccount: '',
+    buyerName: '',
+    buyerAddress: '',
+    buyerLocation: '',
+    buyerVatID: ''
+  }
 };
 
 export const RateStore = signalStore(
@@ -22,12 +34,12 @@ export const RateStore = signalStore(
     const ratesService = inject(RatesService);
 
     return {
-      getExchangeRates: async (currency = CurrencyIso.usd): Promise<void> => {
+      getExchangeRates: async (date: string, currency = CurrencyIso.usd): Promise<void> => {
         let rate: number;
         if (currency === 'PLN') {
           rate = 1;
         } else {
-          const { rates } = await ratesService.getExchangeRates(currency);
+          const { rates } = await ratesService.getExchangeRates(date, currency);
           rate = rates[0].mid;
         }
 
