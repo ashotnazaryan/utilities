@@ -7,6 +7,23 @@
         </mat-card-header>
         <mat-card-content>
           <div class="grid gap-3">
+            <div class="grid grid-cols-3 gap-3">
+              <mat-form-field>
+                <mat-label>Salary</mat-label>
+                <input type="number" matInput [formControlName]="reportFormField.salary" placeholder="Seller salary">
+                <mat-error *ngIf="reportForm.get(reportFormField.salary)?.hasError('required')">Seller salary is
+                  required</mat-error>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Currency</mat-label>
+                <mat-select [formControlName]="reportFormField.currency">
+                  <mat-option *ngFor="let currency of currencies" [value]="currency.iso">
+                    {{currency.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-checkbox [formControlName]="reportFormField.vatIncluded">Include VAT (23%)</mat-checkbox>
+            </div>
             <mat-form-field>
               <mat-label>Name</mat-label>
               <input matInput [formControlName]="reportFormField.sellerName" placeholder="Seller name">
@@ -37,22 +54,6 @@
               <mat-error *ngIf="reportForm.get(reportFormField.sellerAccount)?.hasError('required')">Seller account is
                 required</mat-error>
             </mat-form-field>
-            <div class="grid grid-cols-2 gap-3">
-              <mat-form-field>
-                <mat-label>Salary</mat-label>
-                <input type="number" matInput [formControlName]="reportFormField.salary" placeholder="Seller salary">
-                <mat-error *ngIf="reportForm.get(reportFormField.salary)?.hasError('required')">Seller salary is
-                  required</mat-error>
-              </mat-form-field>
-              <mat-form-field>
-                <mat-label>Currency</mat-label>
-                <mat-select [formControlName]="reportFormField.currency">
-                  <mat-option *ngFor="let currency of currencies" [value]="currency.iso">
-                    {{currency.name}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
           </div>
         </mat-card-content>
       </mat-card>

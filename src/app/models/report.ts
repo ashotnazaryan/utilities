@@ -3,6 +3,7 @@ import { CurrencyIso } from '@constants';
 export interface ReportDetails {
   currency: CurrencyIso;
   salary: number;
+  vatIncluded: boolean;
   sellerName: string;
   sellerAddress: string;
   sellerLocation: string;
@@ -17,6 +18,12 @@ export interface ReportDetails {
 export interface ReportState {
   rate: number;
   details: ReportDetails;
+}
+
+export interface Amount {
+  net: string;
+  gross: string;
+  vat: string;
 }
 
 export interface NBPResponse {

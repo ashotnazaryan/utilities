@@ -1,15 +1,16 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, patchState, withComputed, withMethods, withState } from '@ngrx/signals';
-import { calculateSalary } from '@utils';
+import { calculateAmount } from '@utils';
 import { RatesService } from '@services';
 import { ReportDetails, ReportState } from '@models';
 import { CURRENCIES, CurrencyIso } from '@constants';
 
 const initialState: ReportState = {
-  rate: 0,
+  rate: 1,
   details: {
     salary: 0,
     currency: CURRENCIES[0].iso,
+    vatIncluded: false,
     sellerName: '',
     sellerAddress: '',
     sellerLocation: '',
@@ -27,7 +28,7 @@ export const RateStore = signalStore(
   withState(initialState),
   withComputed(({ rate, details }) => {
     return {
-      amount: computed(() => calculateSalary(rate(), details().salary)),
+      amount: computed(() => calculateAmount(rate(), details().salary, details().vatIncluded)),
     }
   }),
   withMethods((state) => {
@@ -36,7 +37,7 @@ export const RateStore = signalStore(
     return {
       getExchangeRates: async (date: string, currency = CurrencyIso.usd): Promise<void> => {
         let rate: number;
-        if (currency === 'PLN') {
+        if (currency === CurrencyIso.pln) {
           rate = 1;
         } else {
           const { rates } = await ratesService.getExchangeRates(date, currency);

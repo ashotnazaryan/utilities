@@ -1,19 +1,17 @@
 import { Injectable, inject } from '@angular/core';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { ReportDetails } from '@models';
+import { Amount, ReportDetails } from '@models';
 import {
   getCurrentDate,
   getLastDateOfPreviousMonth,
   getFirstDateOfPreviousMonth,
   getDayOfCurrentMonth,
-  getPreviousMonthName
+  getPreviousMonthShortName,
+  getPreviousMonthLongName
 } from '@utils';
 import { FontService } from '@services';
-
-const MARGIN = 36;
-const FONT_SIZE_MEDIUM = 14;
-const FONT_SIZE_LARGE = 16;
+import { CurrencyIso } from '@constants';
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +19,12 @@ const FONT_SIZE_LARGE = 16;
 export class ReportService {
   private pdfDoc?: PDFDocument;
   private fontService = inject(FontService);
+  private readonly margin = 24;
+  private readonly smallFont = 11;
+  private readonly mediumFont = 12;
+  private readonly largeFont = 13;
 
-  async generateReport(details: ReportDetails & { amount: string }): Promise<void> {
+  async generateReport(details: ReportDetails & { amount: Amount }): Promise<void> {
     const pdfDoc = await PDFDocument.create();
     pdfDoc.registerFontkit(fontkit);
     const page = pdfDoc.addPage();
@@ -31,44 +33,98 @@ export class ReportService {
     const boldFontBytes = await this.fontService.loadUbuntuFont('bold');
     const font = await pdfDoc.embedFont(fontBytes);
     const boldFont = await pdfDoc.embedFont(boldFontBytes);
-    const { amount, sellerName, sellerAddress, sellerLocation, sellerVatID, sellerAccount, buyerName, buyerAddress, buyerLocation, buyerVatID } = details;
+    const { amount, vatIncluded, sellerName, sellerAddress, sellerLocation, sellerVatID, sellerAccount, buyerName, buyerAddress, buyerLocation, buyerVatID } = details;
+    const tableHeaderHeight = 50;
     this.pdfDoc = pdfDoc;
 
-    page.drawText('Invoice No.', { x: MARGIN, y: height - MARGIN, font: boldFont, size: FONT_SIZE_MEDIUM });
-    page.drawText(getFirstDateOfPreviousMonth(), { x: MARGIN + 130, y: height - MARGIN, font: font, size: FONT_SIZE_MEDIUM });
+    // document dates
+    page.drawText('Invoice No.', { x: this.margin, y: height - this.margin, font: boldFont, size: this.mediumFont });
+    page.drawText(getFirstDateOfPreviousMonth(), { x: this.margin + 130, y: height - this.margin, font: font, size: this.mediumFont });
 
-    page.drawText('Issue date:', { x: MARGIN, y: height - MARGIN - 20, font: boldFont, size: FONT_SIZE_MEDIUM });
-    page.drawText(getCurrentDate(), { x: MARGIN + 130, y: height - MARGIN - 20, font: font, size: FONT_SIZE_MEDIUM });
+    page.drawText('Issue date:', { x: this.margin, y: height - this.margin - 20, font: boldFont, size: this.mediumFont });
+    page.drawText(getCurrentDate(), { x: this.margin + 130, y: height - this.margin - 20, font: font, size: this.mediumFont });
 
-    page.drawText('Sale date:', { x: MARGIN, y: height - MARGIN - 40, font: boldFont, size: FONT_SIZE_MEDIUM });
-    page.drawText(getLastDateOfPreviousMonth(), { x: MARGIN + 130, y: height - MARGIN - 40, font: font, size: FONT_SIZE_MEDIUM });
+    page.drawText('Sale date:', { x: this.margin, y: height - this.margin - 40, font: boldFont, size: this.mediumFont });
+    page.drawText(getLastDateOfPreviousMonth(), { x: this.margin + 130, y: height - this.margin - 40, font: font, size: this.mediumFont });
 
-    page.drawText('Due date:', { x: MARGIN, y: height - MARGIN - 60, font: boldFont, size: FONT_SIZE_MEDIUM });
-    page.drawText(getDayOfCurrentMonth(14), { x: MARGIN + 130, y: height - MARGIN - 60, font: font, size: FONT_SIZE_MEDIUM });
+    page.drawText('Due date:', { x: this.margin, y: height - this.margin - 60, font: boldFont, size: this.mediumFont });
+    page.drawText(getDayOfCurrentMonth(14), { x: this.margin + 130, y: height - this.margin - 60, font: font, size: this.mediumFont });
 
-    page.drawText('Payment type:', { x: MARGIN, y: height - MARGIN - 80, font: boldFont, size: FONT_SIZE_MEDIUM });
-    page.drawText('Transfer', { x: MARGIN + 130, y: height - MARGIN - 80, font: font, size: FONT_SIZE_MEDIUM });
+    page.drawText('Payment type:', { x: this.margin, y: height - this.margin - 80, font: boldFont, size: this.mediumFont });
+    page.drawText('Transfer', { x: this.margin + 130, y: height - this.margin - 80, font: font, size: this.mediumFont });
 
-    page.drawText('Seller:', { x: MARGIN, y: height - MARGIN - 120, font: boldFont, size: FONT_SIZE_MEDIUM });
-    page.drawText('Buyer:', { x: width / 2 + MARGIN, y: height - MARGIN - 120, font: boldFont, size: FONT_SIZE_MEDIUM });
+    // document content
+    page.drawText('Seller:', { x: this.margin, y: height - this.margin - 120, font: boldFont, size: this.mediumFont });
+    page.drawText('Buyer:', { x: width / 2 + this.margin, y: height - this.margin - 120, font: boldFont, size: this.mediumFont });
 
-    page.drawText(sellerName, { x: MARGIN, y: height - MARGIN - 140, font: font, size: FONT_SIZE_MEDIUM });
-    page.drawText(buyerName, { x: width / 2 + MARGIN, y: height - MARGIN - 140, font: font, size: FONT_SIZE_MEDIUM });
+    page.drawText(sellerName, { x: this.margin, y: height - this.margin - 140, font: font, size: this.mediumFont });
+    page.drawText(buyerName, { x: width / 2 + this.margin, y: height - this.margin - 140, font: font, size: this.mediumFont });
 
-    page.drawText(sellerAddress, { x: MARGIN, y: height - MARGIN - 160, font: font, size: FONT_SIZE_MEDIUM });
-    page.drawText(buyerAddress, { x: width / 2 + MARGIN, y: height - MARGIN - 160, font: font, size: FONT_SIZE_MEDIUM });
+    page.drawText(sellerAddress, { x: this.margin, y: height - this.margin - 160, font: font, size: this.mediumFont });
+    page.drawText(buyerAddress, { x: width / 2 + this.margin, y: height - this.margin - 160, font: font, size: this.mediumFont });
 
-    page.drawText(sellerLocation, { x: MARGIN, y: height - MARGIN - 180, font: font, size: FONT_SIZE_MEDIUM });
-    page.drawText(buyerLocation, { x: width / 2 + MARGIN, y: height - MARGIN - 180, font: font, size: FONT_SIZE_MEDIUM });
+    page.drawText(sellerLocation, { x: this.margin, y: height - this.margin - 180, font: font, size: this.mediumFont });
+    page.drawText(buyerLocation, { x: width / 2 + this.margin, y: height - this.margin - 180, font: font, size: this.mediumFont });
 
-    page.drawText(`VAT ID ${sellerVatID}`, { x: MARGIN, y: height - MARGIN - 200, font: font, size: FONT_SIZE_MEDIUM });
-    page.drawText(`VAT ID ${buyerVatID}`, { x: width / 2 + MARGIN, y: height - MARGIN - 200, font: font, size: FONT_SIZE_MEDIUM });
+    page.drawText(`VAT ID ${sellerVatID}`, { x: this.margin, y: height - this.margin - 200, font: font, size: this.mediumFont });
+    page.drawText(`VAT ID ${buyerVatID}`, { x: width / 2 + this.margin, y: height - this.margin - 200, font: font, size: this.mediumFont });
 
-    page.drawText(sellerAccount, { x: MARGIN, y: height - MARGIN - 240, font: font, size: FONT_SIZE_MEDIUM });
+    page.drawText(sellerAccount, { x: this.margin, y: height - this.margin - 240, font: font, size: this.mediumFont });
 
-    const totalText = `Total: ${amount}`;
-    const totalTextWidth = font.widthOfTextAtSize(totalText, FONT_SIZE_LARGE);
-    page.drawText(totalText, { x: (width - totalTextWidth) / 2 - MARGIN, y: MARGIN, font: boldFont });
+    // table header
+    page.drawRectangle({ x: this.margin, y: height - this.margin - 330, width: width - 2 * this.margin, height: tableHeaderHeight, color: rgb(0.7, 0.7, 0.7), borderColor: rgb(0, 0, 0), borderWidth: 1 });
+
+    // table header cells
+    page.drawText('No', { x: this.margin + 10, y: height - this.margin - 310, font: font, size: this.smallFont });
+    page.drawText('Name', { x: this.margin + 40, y: height - this.margin - 310, font: font, size: this.smallFont });
+    page.drawText('Unit', { x: this.margin + 155, y: height - this.margin - 310, font: font, size: this.smallFont });
+    page.drawText('Qty', { x: this.margin + 185, y: height - this.margin - 310, font: font, size: this.smallFont });
+    page.drawText('Unit net', { x: this.margin + 220, y: height - this.margin - 300, font: font, size: this.smallFont });
+    page.drawText('price', { x: this.margin + 220, y: height - this.margin - 320, font: font, size: this.smallFont });
+    page.drawText('Net value', { x: this.margin + 275, y: height - this.margin - 310, font: font, size: this.smallFont });
+    page.drawText('VAT rate', { x: this.margin + 360, y: height - this.margin - 295, font: font, size: this.smallFont });
+    page.drawText('%', { x: this.margin + 345, y: height - this.margin - 320, font: font, size: this.smallFont });
+    page.drawText('Amount', { x: this.margin + 380, y: height - this.margin - 320, font: font, size: this.smallFont });
+    page.drawText('Gross', { x: this.margin + 440, y: height - this.margin - 300, font: font, size: this.smallFont });
+    page.drawText('value', { x: this.margin + 440, y: height - this.margin - 320, font: font, size: this.smallFont });
+    page.drawText('Currency', { x: this.margin + 495, y: height - this.margin - 310, font: font, size: this.smallFont });
+
+    // table body
+    page.drawRectangle({ x: this.margin, y: height - this.margin - 330 - tableHeaderHeight, width: width - 2 * this.margin, height: tableHeaderHeight, borderColor: rgb(0, 0, 0), borderWidth: 1 });
+
+    // table cell (header/body) borders
+    page.drawLine({ start: { x: this.margin + 30, y: height - this.margin - 330 + tableHeaderHeight }, end: { x: this.margin + 30, y: height - this.margin - 330 - tableHeaderHeight }, thickness: 1 });
+    page.drawLine({ start: { x: this.margin + 150, y: height - this.margin - 330 + tableHeaderHeight }, end: { x: this.margin + 150, y: height - this.margin - 330 - tableHeaderHeight }, thickness: 1 });
+    page.drawLine({ start: { x: this.margin + 180, y: height - this.margin - 330 + tableHeaderHeight }, end: { x: this.margin + 180, y: height - this.margin - 330 - tableHeaderHeight }, thickness: 1 });
+    page.drawLine({ start: { x: this.margin + 210, y: height - this.margin - 330 + tableHeaderHeight }, end: { x: this.margin + 210, y: height - this.margin - 330 - tableHeaderHeight }, thickness: 1 });
+    page.drawLine({ start: { x: this.margin + 270, y: height - this.margin - 330 + tableHeaderHeight }, end: { x: this.margin + 270, y: height - this.margin - 330 - tableHeaderHeight }, thickness: 1 });
+    page.drawLine({ start: { x: this.margin + 330, y: height - this.margin - 330 + tableHeaderHeight }, end: { x: this.margin + 330, y: height - this.margin - 330 - tableHeaderHeight }, thickness: 1 });
+    page.drawLine({ start: { x: this.margin + 430, y: height - this.margin - 330 + tableHeaderHeight }, end: { x: this.margin + 430, y: height - this.margin - 330 - tableHeaderHeight }, thickness: 1 });
+    page.drawLine({ start: { x: this.margin + 370, y: height - this.margin - 353 + tableHeaderHeight }, end: { x: this.margin + 370, y: height - this.margin - 330 - tableHeaderHeight }, thickness: 1 });
+    page.drawLine({ start: { x: this.margin + 490, y: height - this.margin - 330 + tableHeaderHeight }, end: { x: this.margin + 490, y: height - this.margin - 330 - tableHeaderHeight }, thickness: 1 });
+    // VAT rate bottom border
+    page.drawLine({ start: { x: this.margin + 330, y: height - this.margin - 353 + tableHeaderHeight }, end: { x: this.margin + 430, y: height - this.margin - 353 + tableHeaderHeight }, thickness: 1 });
+
+    // table body cells
+    page.drawText('1', { x: this.margin + 10, y: height - this.margin - 350, font: font, size: this.smallFont });
+    page.drawText('Programming services', { x: this.margin + 35, y: height - this.margin - 350, font: font, size: this.smallFont });
+    page.drawText(`${getPreviousMonthLongName()}`, { x: this.margin + 35, y: height - this.margin - 370, font: font, size: this.smallFont });
+    page.drawText('—', { x: this.margin + 160, y: height - this.margin - 350, font: font, size: this.smallFont });
+    page.drawText('1', { x: this.margin + 190, y: height - this.margin - 350, font: font, size: this.smallFont });
+    page.drawText(amount.net, { x: this.margin + 220, y: height - this.margin - 350, font: font, size: this.smallFont });
+    page.drawText(amount.net, { x: this.margin + 280, y: height - this.margin - 350, font: font, size: this.smallFont });
+    page.drawText(`${vatIncluded ? '23%' : 'zw'}`, { x: this.margin + 340, y: height - this.margin - 350, font: font, size: this.smallFont });
+    page.drawText(`${vatIncluded ? amount.vat : '—'}`, { x: this.margin + 380, y: height - this.margin - 350, font: font, size: this.smallFont });
+    page.drawText(`${vatIncluded ? amount.gross : amount.net}`, { x: this.margin + 440, y: height - this.margin - 350, font: font, size: this.smallFont });
+    page.drawText(CurrencyIso.pln, { x: this.margin + 500, y: height - this.margin - 350, font: font, size: this.smallFont });
+
+    // document total
+    const totalText = `Total: ${amount.gross} ${CurrencyIso.pln}`;
+    const totalTextWidth = font.widthOfTextAtSize(totalText, this.largeFont);
+    page.drawText(totalText, { x: width - totalTextWidth - this.margin, y: height - this.margin - 410, font: boldFont, size: this.largeFont });
+
+    // VAT exemption
+    page.drawText(`${vatIncluded ? '' : 'Podstawa zwolnienia z VAT: Zwolnienie podmiotowe zg. z art. 113 ust. 1 i 9 ustawy o VAT.'}`, { x: this.margin, y: height - this.margin - 450, font: font, size: this.mediumFont });
   }
 
   async getReportUrl(): Promise<string> {
@@ -86,7 +142,7 @@ export class ReportService {
     const link = document.createElement('a');
 
     link.href = blobUrl;
-    link.download = `Invoice_${getPreviousMonthName()}.pdf`;
+    link.download = `Invoice_${getPreviousMonthShortName()}.pdf`;
     document.body.appendChild(link);
     link.click();
     URL.revokeObjectURL(blobUrl);
