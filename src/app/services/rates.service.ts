@@ -11,6 +11,6 @@ export class RatesService {
   constructor(private http: HttpClient) { }
 
   getExchangeRates(date: string, currency = CurrencyIso.usd): Promise<NBPResponse> {
-    return firstValueFrom(this.http.get<NBPResponse>(`http://api.nbp.pl/api/exchangerates/rates/A/${currency}/${date}`));
+    return firstValueFrom(this.http.get<NBPResponse>(`https://api.nbp.pl/api/exchangerates/rates/A/${currency}/${date}`));
   }
 }
