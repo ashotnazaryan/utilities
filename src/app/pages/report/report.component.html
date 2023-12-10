@@ -1,11 +1,16 @@
 <div class="flex flex-col gap-3">
   <h3 class="text-xl text-center mb-2">Report</h3>
-  <div class="grid grid-cols-5 gap-3">
+  <div class="grid grid-cols-12 gap-3">
     <app-report-form
-      class="col-span-3"
+      class="md:col-span-6 xs:col-span-12"
       (formChanged)="handleFormChange($event)"
       (formSubmitted)="handleFormSubmit()">
     </app-report-form>
-    <app-report-preview class="col-span-2" [url]="pdfUrl"></app-report-preview>
+    <app-report-preview class="md:col-span-6 xs:col-span-12" [url]="pdfUrl"></app-report-preview>
+  </div>
+  <div class="flex justify-end gap-3 mt-4">
+    <button mat-raised-button color="primary" type="submit" (click)="handleFormSubmit()">
+      Download report
+    </button>
   </div>
 </div>

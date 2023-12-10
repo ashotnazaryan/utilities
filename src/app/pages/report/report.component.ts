@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
 import { RateStore } from '@store';
 import { getLastDateOfPreviousMonth } from '@utils';
 import { ReportDetails } from '@models';
@@ -9,7 +10,7 @@ import { ReportFormComponent, ReportPreviewComponent } from '@components';
 @Component({
   selector: 'app-report',
   standalone: true,
-  imports: [CommonModule, ReportFormComponent, ReportPreviewComponent],
+  imports: [CommonModule, ReportFormComponent, ReportPreviewComponent, MatButtonModule],
   providers: [RateStore, ReportService],
   templateUrl: './report.component.html',
   styleUrl: './report.component.scss',
