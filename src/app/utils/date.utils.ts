@@ -26,7 +26,12 @@ export const getDayOfCurrentMonth = (day: number): string => {
   return date.format(DATE_FORMAT_ISO);
 };
 
-export const getPreviousMonthName = (): string => {
+export const getPreviousMonthShortName = (): string => {
   const currentDate = moment();
   return currentDate.subtract(1, 'months').format('MMMM');
+};
+
+export const getPreviousMonthLongName = (): string => {
+  const currentDate = moment();
+  return currentDate.subtract(1, 'months').format('MMMM YYYY');
 };

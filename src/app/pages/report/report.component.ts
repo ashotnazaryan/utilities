@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RateStore } from '@store';
 import { getLastDateOfPreviousMonth } from '@utils';
 import { ReportDetails } from '@models';
-import { CurrencyIso } from '@constants';
 import { ReportService } from '@services';
 import { ReportFormComponent, ReportPreviewComponent } from '@components';
 
@@ -31,7 +30,7 @@ export class ReportComponent implements OnInit {
   async handleFormSubmit(): Promise<void> {
     const { amount, details } = this.store;
 
-    await this.reportService.generateReport({ amount: `${amount()} ${CurrencyIso.pln}`, ...details() });
+    await this.reportService.generateReport({ amount: amount(), ...details() });
     await this.reportService.downloadReport();
   }
 
@@ -43,7 +42,7 @@ export class ReportComponent implements OnInit {
     }
 
     this.store.setDetails(formValue);
-    await this.reportService.generateReport({ amount: `${amount()} ${CurrencyIso.pln}`, ...details() });
+    await this.reportService.generateReport({ amount: amount(), ...details() });
     this.pdfUrl = await this.reportService.getReportUrl();
     this.cdRef.detectChanges();
   }
